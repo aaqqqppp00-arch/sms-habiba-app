@@ -111,7 +111,7 @@ const Layout = ({ isAuthenticated }) => {
                 <Link onClick={() => setIsDropdownOpen(false)} to="/profile" className="block px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">My Profile</Link>
                 <Link onClick={() => setIsDropdownOpen(false)} to="/settings" className="block px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Account Settings</Link>
                 <div className="border-t border-gray-100 dark:border-gray-700 my-1.5"></div>
-                <a href="/login" className="block px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Log out</a>
+                <a href="/#/login" className="block px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Log out</a>
               </div>
             </div>
           </div>

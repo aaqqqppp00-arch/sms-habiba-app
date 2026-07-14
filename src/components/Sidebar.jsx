@@ -60,7 +60,7 @@ const Sidebar = () => {
       {/* Logout Footer */}
       <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800">
         <a 
-          href="/login" 
+          href="/#/login" 
           title={isCollapsed ? "Logout" : ""}
           className={`
             flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-gray-500 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400
