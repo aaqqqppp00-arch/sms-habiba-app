@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { GlobalProvider } from './context/GlobalContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
