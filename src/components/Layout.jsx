@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Navigate, Outlet, Link, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useGlobalContext } from '../context/GlobalContext';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Menu, X } from 'lucide-react';
 
 const Layout = ({ isAuthenticated }) => {
   const { theme, setTheme, profileImage } = useGlobalContext();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -36,19 +37,47 @@ const Layout = ({ isAuthenticated }) => {
   const location = useLocation();
   const currentPath = location.pathname.split('/')[1] || 'dashboard';
 
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname]);
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900 font-sans transition-colors duration-200">
-      <div className="sticky top-0 h-screen flex-shrink-0 z-[60]">
+      
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:block sticky top-0 h-screen flex-shrink-0 z-[60]">
         <Sidebar />
       </div>
-      <div className="flex-1 flex flex-col min-w-0">
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-[70] flex lg:hidden">
+          <div 
+            className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          ></div>
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-900 shadow-xl z-50">
+            <Sidebar />
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 flex flex-col min-w-0 w-full">
         {/* Top Header */}
-        <header className="sticky top-0 z-50 h-16 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between px-8 flex-shrink-0 transition-colors duration-200">
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <span>Admin Portal</span>
-            <span>/</span>
+        <header className="sticky top-0 z-50 h-16 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between px-4 lg:px-8 flex-shrink-0 transition-colors duration-200">
+          <div className="flex items-center gap-3 lg:gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <button 
+              className="lg:hidden p-2 -ml-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+              onClick={() => setIsMobileSidebarOpen(true)}
+            >
+              <Menu size={20} className="text-gray-900 dark:text-white" />
+            </button>
+            <span className="hidden sm:inline">Admin Portal</span>
+            <span className="hidden sm:inline">/</span>
             <span className="text-gray-900 dark:text-white font-medium capitalize">{currentPath}</span>
           </div>
+          
           <div className="flex items-center gap-3 relative">
             {/* Theme Toggle Button */}
             <button
@@ -89,7 +118,7 @@ const Layout = ({ isAuthenticated }) => {
         </header>
         
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 w-full">
           <Outlet />
         </main>
       </div>
