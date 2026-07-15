@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, X, CheckCircle } from 'lucide-react';
+import { api } from '../utils/api';
 
 const Login = ({ setAuth }) => {
   const [email, setEmail] = useState('');
@@ -13,32 +14,49 @@ const Login = ({ setAuth }) => {
   const [resetEmail, setResetEmail] = useState('');
   const [isSendingReset, setIsSendingReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [error, setError] = useState('');
+  const [forgotError, setForgotError] = useState('');
 
-  const handleForgotPassword = (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
     if (!resetEmail) return;
     setIsSendingReset(true);
-    // Simulate API
-    setTimeout(() => {
-      setIsSendingReset(false);
+    setForgotError('');
+    try {
+      await api.forgotPassword(resetEmail);
       setResetSent(true);
       setTimeout(() => {
         setIsForgotModalOpen(false);
         setResetSent(false);
         setResetEmail('');
+        setForgotError('');
       }, 3000);
-    }, 1000);
+    } catch (err) {
+      console.error(err);
+      setForgotError(err.message || 'An error occurred.');
+    } finally {
+      setIsSendingReset(false);
+    }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    setError('');
+    try {
+      const response = await api.login(email, password);
+      localStorage.setItem('token', response.access_token);
       setAuth(true);
       navigate('/dashboard');
-    }, 800);
+    } catch (err) {
+      if (err.status === 401 || err.status === 403) {
+        setError('Invalid email or password.');
+      } else {
+        setError('Unable to connect to the server. Please check your connection or contact IT.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -68,11 +86,11 @@ const Login = ({ setAuth }) => {
         </div>
 
         <div className="relative z-10 flex items-center gap-4 text-zinc-500 text-sm font-medium">
-          <span>&copy; 2024 DEPI Initiative</span>
+          <span>&copy; 2026 Nursoid Initiative. Developed by Eng Mahmoud Hassan</span>
           <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-          <a href="#" className="hover:text-zinc-300 transition-colors">Privacy Policy</a>
+          <Link to="/privacy-policy" className="hover:text-zinc-300 transition-colors">Privacy Policy</Link>
           <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-          <a href="#" className="hover:text-zinc-300 transition-colors">Terms of Service</a>
+          <Link to="/terms-of-service" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
         </div>
       </div>
 
@@ -92,6 +110,12 @@ const Login = ({ setAuth }) => {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
+            {error && (
+              <div className="bg-red-50 text-red-600 border border-red-200 p-3 rounded-lg text-sm mb-6">
+                {error}
+              </div>
+            )}
+            
             <div className="space-y-2">
               <label className="block text-sm font-medium text-zinc-700" htmlFor="email">
                 Email Address
@@ -103,7 +127,10 @@ const Login = ({ setAuth }) => {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError('');
+                  }}
                   className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all shadow-sm"
                   placeholder="admin@depi.edu"
                 />
@@ -121,7 +148,10 @@ const Login = ({ setAuth }) => {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError('');
+                  }}
                   className="w-full pl-11 pr-11 py-2.5 bg-white border border-gray-200 rounded-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all shadow-sm"
                   placeholder="••••••••"
                 />
@@ -206,8 +236,8 @@ const Login = ({ setAuth }) => {
                       <CheckCircle size={24} />
                     </div>
                     <h4 className="text-lg font-medium text-zinc-900 mb-2">Check your email</h4>
-                    <p className="text-sm text-zinc-500">
-                      We've sent password reset instructions to <span className="font-medium text-zinc-900">{resetEmail}</span>
+                    <p className="text-sm text-zinc-500 max-w-xs mx-auto">
+                      If an account exists, a reset link has been sent to your email.
                     </p>
                   </div>
                 ) : (
@@ -215,6 +245,13 @@ const Login = ({ setAuth }) => {
                     <p className="text-sm text-zinc-600 mb-6">
                       Enter the email address associated with your account and we'll send you a link to reset your password.
                     </p>
+                    
+                    {forgotError && (
+                      <div className="bg-red-50 text-red-600 border border-red-200 p-3 rounded-lg text-sm mb-4">
+                        {forgotError}
+                      </div>
+                    )}
+                    
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-zinc-700">
                         Email Address
@@ -225,7 +262,10 @@ const Login = ({ setAuth }) => {
                           type="email"
                           required
                           value={resetEmail}
-                          onChange={(e) => setResetEmail(e.target.value)}
+                          onChange={(e) => {
+                            setResetEmail(e.target.value);
+                            setForgotError('');
+                          }}
                           className="w-full pl-11 pr-4 py-2.5 bg-white border border-zinc-200 rounded-none text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 transition-all shadow-sm"
                           placeholder="admin@depi.edu"
                         />

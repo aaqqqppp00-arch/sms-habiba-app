@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
+import { useGlobalContext } from '../context/GlobalContext';
+import { Link } from 'react-router-dom';
 import { Search, Plus, Users, Clock, User, ArrowRight, MoreHorizontal, X } from 'lucide-react';
 
-const initialCourses = [
-  { id: 1, title: 'Advanced Mathematics', instructor: 'Dr. Sarah Wilson', students: 45, duration: '12 Weeks', status: 'Active' },
-  { id: 2, title: 'Physics Fundamentals', instructor: 'Prof. James Chen', students: 38, duration: '10 Weeks', status: 'Active' },
-  { id: 3, title: 'Introduction to Computer Science', instructor: 'Alice Johnson', students: 120, duration: '16 Weeks', status: 'Active' },
-  { id: 4, title: 'World History', instructor: 'Dr. Robert Brown', students: 60, duration: '14 Weeks', status: 'Draft' },
-  { id: 5, title: 'Chemistry 101', instructor: 'Dr. Emily White', students: 50, duration: '12 Weeks', status: 'Upcoming' },
-  { id: 6, title: 'Literature and Society', instructor: 'Prof. Michael Green', students: 42, duration: '10 Weeks', status: 'Active' },
-];
-
 const Courses = () => {
-  const [courses, setCourses] = useState(initialCourses);
+  const { courses, addCourse, updateCourse, deleteCourse } = useGlobalContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
   
   const [formData, setFormData] = useState({
     title: '', instructor: '', students: '', duration: '', status: 'Active'
@@ -28,10 +22,10 @@ const Courses = () => {
     e.preventDefault();
     const newCourse = {
       ...formData,
-      id: Date.now(),
       students: parseInt(formData.students) || 0,
+      price: 0, // Backend requirement
     };
-    setCourses([...courses, newCourse]);
+    addCourse(newCourse);
     closeModal();
   };
 
@@ -103,9 +97,12 @@ const Courses = () => {
                 </div>
               </div>
               
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-sm font-medium">
+              <Link 
+                to={`/courses/${course.id || 123}`}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-dashed border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-sm font-medium"
+              >
                 View Details <ArrowRight size={14} />
-              </button>
+              </Link>
             </div>
           </div>
         ))}
@@ -156,6 +153,7 @@ const Courses = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

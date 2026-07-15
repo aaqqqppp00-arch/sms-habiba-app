@@ -1,17 +1,14 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { api } from '../utils/api';
 
 const GlobalContext = createContext();
 
 export const useGlobalContext = () => useContext(GlobalContext);
 
 export const GlobalProvider = ({ children }) => {
-  const [students, setStudents] = useState([
-    { id: '1', rollNo: 'S001', name: 'Ahmed Ali', email: 'ahmed@example.com', class: 'Grade 10', department: 'Science', status: 'Active' },
-    { id: '2', rollNo: 'S002', name: 'Sara Hassan', email: 'sara@example.com', class: 'Grade 11', department: 'Arts', status: 'Active' },
-    { id: '3', rollNo: 'S003', name: 'Omar Sayed', email: 'omar@example.com', class: 'Grade 10', department: 'Science', status: 'Inactive' },
-    { id: '4', rollNo: 'S004', name: 'Nour Youssef', email: 'nour@example.com', class: 'Grade 12', department: 'Math', status: 'Active' },
-  ]);
-
+  const [students, setStudents] = useState([]);
+  const [courses, setCourses] = useState([]);
+  
   const [teachers, setTeachers] = useState([
     { id: '1', teacherId: 'T001', name: 'Dr. Sarah Wilson', department: 'Science', subject: 'Advanced Mathematics', experience: '10 Years', status: 'Active' },
     { id: '2', teacherId: 'T002', name: 'Prof. James Chen', department: 'Science', subject: 'Physics Fundamentals', experience: '8 Years', status: 'Active' },
@@ -22,16 +19,81 @@ export const GlobalProvider = ({ children }) => {
     { studentId: '2', date: new Date().toISOString().split('T')[0], status: 'Absent' },
   ]);
 
-  const addStudent = (student) => {
-    setStudents([...students, { ...student, id: Date.now().toString() }]);
+  useEffect(() => {
+    fetchStudents();
+    fetchCourses();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const res = await api.getStudents();
+      setStudents(res.data || []);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const updateStudent = (id, updatedStudent) => {
-    setStudents(students.map(s => (s.id === id ? { ...s, ...updatedStudent } : s)));
+  const addStudent = async (student) => {
+    try {
+      await api.createStudent(student);
+      fetchStudents();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const deleteStudent = (id) => {
-    setStudents(students.filter(s => s.id !== id));
+  const updateStudent = async (id, updatedStudent) => {
+    try {
+      await api.updateStudent(id, updatedStudent);
+      fetchStudents();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteStudent = async (id) => {
+    try {
+      await api.deleteStudent(id);
+      fetchStudents();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const res = await api.getCourses();
+      setCourses(res.data || []);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const addCourse = async (course) => {
+    try {
+      await api.createCourse(course);
+      fetchCourses();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const updateCourse = async (id, updatedCourse) => {
+    try {
+      await api.updateCourse(id, updatedCourse);
+      fetchCourses();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteCourse = async (id) => {
+    try {
+      await api.deleteCourse(id);
+      fetchCourses();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const addTeacher = (teacher) => {
@@ -68,7 +130,8 @@ export const GlobalProvider = ({ children }) => {
 
   return (
     <GlobalContext.Provider value={{
-      students, addStudent, updateStudent, deleteStudent,
+      students, addStudent, updateStudent, deleteStudent, fetchStudents,
+      courses, addCourse, updateCourse, deleteCourse, fetchCourses,
       teachers, addTeacher,
       attendance, updateAttendance,
       theme, setTheme,

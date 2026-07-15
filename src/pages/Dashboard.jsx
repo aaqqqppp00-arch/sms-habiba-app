@@ -21,10 +21,20 @@ const Dashboard = () => {
     return acc;
   }, {});
 
-  const pieData = Object.keys(departmentData).map(key => ({
+  let pieData = Object.keys(departmentData).map(key => ({
     name: key,
     value: departmentData[key]
   }));
+
+  // Fallback dummy data if DB is empty
+  if (pieData.length === 0) {
+    pieData = [
+      { name: 'Science', value: 45 },
+      { name: 'Arts', value: 30 },
+      { name: 'Math', value: 25 },
+      { name: 'History', value: 15 },
+    ];
+  }
 
   const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'];
 
@@ -49,7 +59,7 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 lg:p-6 pb-2">
+    <div className="w-full max-w-7xl mx-auto pb-2">
       {/* Page Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Overview</h1>

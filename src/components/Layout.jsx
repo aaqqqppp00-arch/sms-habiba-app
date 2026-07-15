@@ -23,6 +23,13 @@ const Layout = ({ isAuthenticated }) => {
     };
   }, []);
 
+  const location = useLocation();
+  const currentPath = location.pathname.split('/')[1] || 'dashboard';
+
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [location.pathname]);
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -33,14 +40,6 @@ const Layout = ({ isAuthenticated }) => {
       : theme;
     setTheme(currentTheme === 'dark' ? 'light' : 'dark');
   };
-
-  const location = useLocation();
-  const currentPath = location.pathname.split('/')[1] || 'dashboard';
-
-  // Close mobile sidebar on route change
-  useEffect(() => {
-    setIsMobileSidebarOpen(false);
-  }, [location.pathname]);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900 font-sans transition-colors duration-200">
@@ -63,9 +62,9 @@ const Layout = ({ isAuthenticated }) => {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 w-full">
+      <div className="flex-1 flex flex-col min-w-0 w-full h-screen">
         {/* Top Header */}
-        <header className="sticky top-0 z-50 h-16 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between px-4 lg:px-8 flex-shrink-0 transition-colors duration-200">
+        <header className="shrink-0 z-50 h-16 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between px-4 lg:px-8 transition-colors duration-200">
           <div className="flex items-center gap-3 lg:gap-4 text-sm text-gray-500 dark:text-gray-400">
             <button 
               className="lg:hidden p-2 -ml-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
@@ -118,7 +117,7 @@ const Layout = ({ isAuthenticated }) => {
         </header>
         
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 w-full">
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 w-full p-6">
           <Outlet />
         </main>
       </div>

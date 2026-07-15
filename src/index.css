@@ -268,4 +268,13 @@ tr:hover td {
   font-weight: 500;
   color: var(--text-muted);
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 @custom-variant dark (&:is(.dark *));
